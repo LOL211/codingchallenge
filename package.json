@@ -1,0 +1,21 @@
+{
+  "name": "ticketing_api",
+  "main": "main.js",
+  "version": "1.0",
+  "dependencies": {
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "node": "^20.2.0",
+    "openai": "^3.2.1"
+  },
+  "scripts": {
+    "start-dev": "cross-env NODE_ENV=development node main.js",
+    "test": "cross-env NODE_ENV=test mocha --timeout 20000 --exit"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
+    "cross-env": "^7.0.3",
+    "mocha": "^10.2.0"
+  }
+}
