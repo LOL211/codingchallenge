@@ -8,7 +8,7 @@ const expect = chai.expect;
 
 describe('POST /tickets', () => {
   beforeEach(() => {
-    // Delete the tickets file before each test
+ //    Delete the tickets file before each test
     try {
       fs.unlinkSync('unique.json');
     } catch (err) {
@@ -94,4 +94,79 @@ describe('POST /tickets', () => {
         done();
       });
   });
-});
+
+
+    it('should reject gibberish message', async () => {
+      const res = await chai.request(server)
+        .post('/tickets')
+        .send({
+          title: 'asdasd',
+          phoneNumber: '1234567890'
+        });
+      expect(res).to.have.status(422);
+      expect(res.text).to.equal('Duplicated or gibberish message');
+    });
+
+    it('should sort tickets by phone number and timestamp', async () => {
+      // Create ticket 1
+      await chai.request(server)
+        .post('/tickets')
+        .send({
+          title: 'Hey can you throw the trash',
+          phoneNumber: '1234567890'
+        });
+  
+      // Create ticket 2
+      await chai.request(server)
+        .post('/tickets')
+        .send({
+          title: 'Hey can you throw the trash out?',
+          phoneNumber: '0987654321'
+        });
+  
+      // Create ticket 3
+      await chai.request(server)
+        .post('/tickets')
+        .send({
+          title: 'Hi I have difficult neighbours',
+          phoneNumber: '1234567890'
+        });
+      
+      // Read the JSON file and check the order of the tickets
+      let data= fs.readFileSync('unique.json');
+    
+ 
+      const tickets = JSON.parse(data);
+      expect(tickets[0].msg).to.equal('Hey can you throw the trash out?');
+      expect(tickets[1].msg).to.equal('Hey can you throw the trash');
+      expect(tickets[2].msg).to.equal('Hi I have difficult neighbours');
+    });
+  
+    it('should reject duplicate tickets', async () => {
+      // Create ticket
+      await chai.request(server)
+        .post('/tickets')
+        .send({
+          title: 'Hey I have annoying neighbours',
+          phoneNumber: '1234567890'
+        });
+  
+      // Try to create a duplicate ticket
+      const res = await chai.request(server)
+        .post('/tickets')
+        .send({
+          title: 'Hey I have annoying neighbours',
+          phoneNumber: '1234567890'
+        });
+
+      
+      
+      // Read the JSON file and check that there is only one ticket
+      const data = fs.readFileSync('unique.json');
+      const tickets = JSON.parse(data);
+      expect(res).to.have.status(422);
+      expect(res.text).to.equal('Duplicated or gibberish message');
+      expect(tickets.length).to.equal(1);
+    });
+  });
+

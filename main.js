@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const gibberish = require("gibberish-detective")({useCache: true});
 const app = express();
 const port = process.env.PORT || 8080;
 const filepath = "unique.json";
@@ -19,12 +20,25 @@ const createticket = (requestBody)=>{
     return tmp;
 }
 
+
+
+
 const updateTickets = (tickets, body)=>{
   
-  tickets.push(createticket(body));
-  
-  
+  let newticket = createticket(body);
+  let dup = false;
+  tickets.forEach(element => {
+    if(element.tel==newticket.tel && element.msg == newticket.msg)
+    {
+      dup=true;
+      return;
+    }
+  });
 
+  if(!dup && !gibberish.detect(newticket.msg))
+    tickets.push(newticket);
+  else
+    return [false, []];
 
   tickets.sort((a, b) => {
     if (a.tel < b.tel) {
@@ -42,12 +56,11 @@ const updateTickets = (tickets, body)=>{
       }
     }
   });
-    return tickets;
+    return [true, tickets];
 }
 
 app.post('/tickets', async (req, res) => {
   const { title, phoneNumber, desc, fileUrl } = req.body;
-  //console.log(req.body);
   // Validate required fields
   if (!title || !phoneNumber) {
     return res.status(400).end('Title and phone number are required');
@@ -55,43 +68,42 @@ app.post('/tickets', async (req, res) => {
   
   let tickets;
 
-//Method 1
-    // try{
-    //     let data = fs.readFileSync(filepath);
-    //     tickets = JSON.parse(data);
-    // }
-    // catch(e){
-    //     if(e.code === 'ENOENT')
-    //         tickets = [];
-    //     else res.status(500).end("Cannot read JSON file");
-    // }
-    // tickets = writetickets(tickets,req.body);
-    // fs.writeFile(filepath, JSON.stringify(tickets), (err)=>{
-    //   res.status(500).end("Write failed");
-    // })
-    // res.status(200).end("Accepted")
-   
-
-//Method 2
   fs.readFile(filepath, (err, data)=>{
       if(err && !(err.code === 'ENOENT'))
-          res.status(500).end("Cannot access JSON file")
-      
+      {
+        res.status(500).end("Cannot access JSON file")
+        return;
+      }
+          
       try{
-        if(data){
+        if(data && data.length>0)
           tickets = JSON.parse(data);
-        }
         else
-        tickets = [];
+          tickets = [];
       }
       catch(e){
         res.status(500).end("JSON file is corrupted");
+        return;
       }
-    tickets = updateTickets(tickets,req.body);
-    fs.writeFile(filepath, JSON.stringify(tickets), (err)=>{
-      res.status(500).end("Write failed");
-    })
-    res.status(200).end("Accepted")
+    let tmp = updateTickets(tickets,req.body);
+    
+    if(!tmp[0])
+    {
+      res.status(422).end("Duplicated or gibberish message");
+      return;
+    }
+    tickets = tmp[1];
+    return new Promise((resolve, reject) => {
+      fs.writeFile(filepath, JSON.stringify(tickets), (err) => {
+        if (err) {
+          res.status(500).end('Write failed');
+          reject(err);
+        } else {
+          res.status(200).end('Accepted');
+          resolve();
+        }
+      });
+    });
 });
 
 });
