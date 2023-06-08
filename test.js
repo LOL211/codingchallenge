@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const fs = require('fs');
-const server = require('./main.js'); // replace with the name of your server file
+const server = require('./main.js'); 
 
 chai.use(chaiHttp);
 const expect = chai.expect;

@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const gibberish = require("gibberish-detective")({useCache: true});
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8000;
 const filepath = "unique.json";
 app.use(express.json());
 
