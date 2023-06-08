@@ -1,4 +1,4 @@
-# codingchallenge
+# Codingchallenge
 
 package.json contains list of third party libraries.
 To install, download the files in a folder and use it as root for the following commands
