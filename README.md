@@ -1,6 +1,7 @@
-# Codingchallenge
+# Coding challenge
 
 package.json contains list of third party libraries.
+
 <br>To install, download the files in a folder and use it as root for the following commands
 <br>Run 'npm install' to automatically download all the packages in package.json
 <br>Then to run, use command node main.js
