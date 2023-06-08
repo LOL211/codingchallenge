@@ -44,6 +44,10 @@ const updateTickets = (tickets, body)=>{
       dup=true;
       return;
     }
+    else if(element.tel>newticket.tel)  // since the array is sorted by phone numbers
+    {
+      return;
+    }
   });
   
   // If not a duplicate and not gibberish, add the new ticket to the array
@@ -116,7 +120,7 @@ app.post('/tickets', async (req, res) => {
     // Update the tickets array with the new ticket data
     tickets = tmp[1];
 
-    // Write the updated tickets array to the JSON file and send response
+    // Write the updated tickets array to the JSON file and send response once completed.
     return new Promise((resolve, reject) => {
       fs.writeFile(filepath, JSON.stringify(tickets), (err) => {
         if (err) {
@@ -149,13 +153,19 @@ let server = app.listen(port, () => {
 
 
 //This was built according to the best understanding of requirements
-//assumptions - grouping of messaging was not required, only a gibberish check was used
+//assumptions - 
+//grouping of messaging was not required according to the email, only a gibberish and duplicate check was used.5
 //The API is not responsible for fixing the JSON file if it is corrupted and assume it must be manually checked
-//Another assumption is that nothing else is accessing the json file and requests will just be handled concurrently
-//Additionally chat gpt request could be made or a custom ML model like naive bayes 
-//or help it automatically create group of messages as one ticket
+//Nothing else is accessing the json file and requests will just be handled concurrently
 // logging capabilities are not added here since it wasn't a request
+// Security was also assumed to not be a requirement and wasn't considered
 
+//Additionally chat gpt request could be made to predictor for gibberish a custom ML model like naive bayes 
+//or help it automatically create group of messages as one ticket
+
+
+//Alternatively, the reading and writing could be done with ReadFileSync and etc.. to design a simpler synchronous structure since async
+//isn't needed according to the assumptions and requirements
 //Sample test cases are in test.js file
 
 // Export the server for testing
