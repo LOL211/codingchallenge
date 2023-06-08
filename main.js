@@ -136,6 +136,10 @@ app.post('/tickets', async (req, res) => {
 
 });
 
+app.get('/download', (req, res) => {
+  const file = __dirname+'/'+filepath;
+  res.download(file)
+});
 // Error-handling middleware for invalid JSON data in request body
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
@@ -167,6 +171,8 @@ let server = app.listen(port, () => {
 //Alternatively, the reading and writing could be done with ReadFileSync and etc.. to design a simpler synchronous structure since async
 //isn't needed according to the assumptions and requirements
 //Sample test cases are in test.js file
+
+//additionally, a download get request can be done to download the json file
 
 // Export the server for testing
 module.exports = server
