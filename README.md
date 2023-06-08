@@ -8,3 +8,4 @@ package.json contains list of third party libraries.
 <br>To test, use command npm test
 <br>There is also a dockerfile that can be used to create an image for deployment.
 <br>Currently an image is hosted at this url: https://coding-challenge.fly.dev/tickets to test out the API endpoint.
+<br>The API is strictly built with Node JS and can be made in typescript, or other libaries
