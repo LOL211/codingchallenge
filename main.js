@@ -34,25 +34,25 @@ const createticket = (requestBody)=>{
 const updateTickets = (tickets, body)=>{
   
   // Create a new ticket from the request body
-  let newticket = createticket(body);
-  let dup = false;
+  let newTicket = createticket(body);
+  let isDuplicate = false;
 
   // Check for duplicates
   tickets.forEach(element => {
-    if(element.tel==newticket.tel && element.msg == newticket.msg)
+    if(element.tel==newTicket.tel && element.msg == newTicket.msg)
     {
-      dup=true;
+      isDuplicate=true;
       return;
     }
-    else if(element.tel>newticket.tel)  // since the array is sorted by phone numbers
+    else if(element.tel>newTicket.tel)  // since the array is sorted by phone numbers
     {
       return;
     }
   });
   
   // If not a duplicate and not gibberish, add the new ticket to the array
-  if(!dup && !gibberish.detect(newticket.msg))
-    tickets.push(newticket);
+  if(!isDuplicate && !gibberish.detect(newTicket.msg))
+    tickets.push(newTicket);
   else
     return [false, []]; //return false to not update array
 
